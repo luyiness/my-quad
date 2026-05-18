@@ -18,6 +18,9 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+
+#include "Com_debug.h"
+#include "freertos_task.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -89,7 +92,9 @@ int main(void)
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
+  Debug_Init();
 
+  Freertos_start();
   /* USER CODE END 2 */
 
   /* Infinite loop */

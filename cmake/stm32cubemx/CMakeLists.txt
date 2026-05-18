@@ -15,6 +15,11 @@ set(MX_Include_Dirs
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/CMSIS/Device/ST/STM32F1xx/Include
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/CMSIS/Include
+	${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/Mid
+	${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/Mid/include
+	${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/Mid/portable
+	${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/SYSTEM/include
+	${CMAKE_CURRENT_SOURCE_DIR}/../../Task/include
 )
 
 # STM32CubeMX generated application sources
@@ -27,6 +32,8 @@ set(MX_Application_Src
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/sysmem.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/syscalls.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../startup_stm32f103xe.s
+	${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/retarget.c
+	${CMAKE_CURRENT_SOURCE_DIR}/../../Task/freertos_task.c
 )
 
 # STM32 HAL/LL Drivers
@@ -47,7 +54,22 @@ set(STM32_Drivers_Src
 )
 
 # Drivers Midllewares
+# freeRTOS
+set(FreeRTOS_Drivers_Src
+		${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/Mid/portable/heap_4.c
+		${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/Mid/portable/port.c
+		${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/Mid/source/croutine.c
+		${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/Mid/source/event_groups.c
+		${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/Mid/source/list.c
+		${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/Mid/source/queue.c
+		${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/Mid/source/stream_buffer.c
+		${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/Mid/source/tasks.c
+		${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/Mid/source/timers.c
+)
 
+#Mine
+file(GLOB_RECURSE MINE_SOURCES
+		"${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/SYSTEM/*.c" )
 
 
 # Link directories setup
@@ -57,6 +79,7 @@ set(MX_LINK_DIRS
 # Project static libraries
 set(MX_LINK_LIBS 
     STM32_Drivers
+	FreeRTOS_Drivers
     ${TOOLCHAIN_LINK_LIBRARIES}
     
 )
@@ -69,6 +92,14 @@ target_compile_definitions(stm32cubemx INTERFACE ${MX_Defines_Syms})
 add_library(STM32_Drivers OBJECT)
 target_sources(STM32_Drivers PRIVATE ${STM32_Drivers_Src})
 target_link_libraries(STM32_Drivers PUBLIC stm32cubemx)
+
+#freertos
+add_library(FreeRTOS_Drivers OBJECT)
+target_sources(FreeRTOS_Drivers PRIVATE ${FreeRTOS_Drivers_Src})
+target_link_libraries(FreeRTOS_Drivers PUBLIC stm32cubemx)
+
+#
+target_sources(${CMAKE_PROJECT_NAME} PRIVATE ${MINE_SOURCES})
 
 
 # Add STM32CubeMX generated application sources to the project
