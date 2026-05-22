@@ -88,7 +88,7 @@ target_link_options(${CMAKE_PROJECT_NAME} PRIVATE
 )
 
 set_source_files_properties(
-        startup_stm32f103xe.S
+        startup_stm32f103xe.s
         PROPERTIES
         LANGUAGE ASM
         COMPILE_FLAGS "-x assembler-with-cpp -mthumb -mcpu=cortex-m3"

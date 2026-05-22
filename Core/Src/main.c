@@ -20,7 +20,9 @@
 #include "main.h"
 
 #include "Com_debug.h"
+#include "delay.h"
 #include "freertos_task.h"
+#include "fsmc_lcd.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -93,7 +95,8 @@ int main(void)
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
   Debug_Init();
-
+  delay_init(72);
+  fsmc_lcd_init();
   Freertos_start();
   /* USER CODE END 2 */
 
@@ -104,8 +107,8 @@ int main(void)
     /* USER CODE END WHILE */
 
     LED0_TOGGLE();
+    delay_ms(500);
     LED1_TOGGLE();
-    HAL_Delay(1000);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
