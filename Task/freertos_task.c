@@ -3,9 +3,12 @@
 //
 
 #include "include/freertos_task.h"
+
+#include "ip5305t.h"
 #include "util.h"
 
 TaskHandle_t printf_task_handle;
+TaskHandle_t power_task_handle;
 
 void printf_task(void *pvParameters)
 {
@@ -18,10 +21,25 @@ void printf_task(void *pvParameters)
     }
 }
 
+void power_task(void *pvParameters)
+{
+    //定时启动一次IP5305T，防止自动关机
+    uint32_t tick = xTaskGetTickCount();
+    while (1)
+    {
+        int_ip5305t_start();
+        vTaskDelayUntil(&tick, power_task_period);
+    }
+}
+
 void Freertos_start(void)
 {
     xTaskCreate(printf_task, "printf_task", printf_task_stacksize, NULL,
         printf_task_priority, &printf_task_handle);
+
+    //power
+    xTaskCreate(power_task, "power_task", power_task_stacksize, NULL,
+        power_task_priority, &power_task_handle);
 
     vTaskStartScheduler();
 }

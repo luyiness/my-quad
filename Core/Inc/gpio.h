@@ -47,6 +47,10 @@ void MX_GPIO_Init(void);
 #define LED1_GPIO_PIN                   GPIO_PIN_5
 #define LED1_GPIO_CLK_ENABLE()          do{ __HAL_RCC_GPIOE_CLK_ENABLE(); }while(0)             /* PE口时钟使能 */
 
+//PB2： 5305T定时唤醒
+#define POWER_KEY_Pin   GPIO_PIN_2
+#define POWER_KEY_GPIO_Port   GPIOB
+
 /******************************************************************************************/
 /* LED端口定义 */
 #define LED0(x)   do{ x ? \

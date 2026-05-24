@@ -45,6 +45,7 @@ void MX_GPIO_Init(void)
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
 
     GPIO_InitTypeDef gpio_init_struct;
     LED0_GPIO_CLK_ENABLE();                                 /* LED0时钟使能 */
@@ -63,6 +64,13 @@ void MX_GPIO_Init(void)
     LED0(1);                                                /* 关闭 LED0 */
     LED1(1);                                                /* 关闭 LED1 */
 
+    //PB2： 5305T定时唤醒
+    gpio_init_struct.Pin = POWER_KEY_Pin;
+    gpio_init_struct.Mode = GPIO_MODE_OUTPUT_PP;
+    gpio_init_struct.Pull = GPIO_PULLUP;
+    gpio_init_struct.Speed = GPIO_SPEED_FREQ_HIGH;
+    HAL_GPIO_Init(POWER_KEY_GPIO_Port, &gpio_init_struct);
+    HAL_GPIO_WritePin(POWER_KEY_GPIO_Port, POWER_KEY_Pin, GPIO_PIN_SET);    //初始化=1
 }
 
 /* USER CODE BEGIN 2 */
