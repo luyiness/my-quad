@@ -36,7 +36,8 @@ void flight_task(void *pvParameters)
     uint32_t tick = xTaskGetTickCount();
     while (1)
     {
-        motor_start();
+        // motor_start();
+        motor_set(&motor_l0);
         vTaskDelayUntil(&tick, power_task_period);
     }
 }
