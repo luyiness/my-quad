@@ -9,6 +9,9 @@
 
 #include "FreeRTOS.h"
 #include "task.h"
+#include "ip5305t.h"
+#include "motor.h"
+#include "util.h"
 
 //printf task
 void printf_task(void *pvParameters);
@@ -21,6 +24,12 @@ void power_task(void *pvParameters);
 #define power_task_priority 3
 #define power_task_stacksize 128
 #define power_task_period 1000      //可设<24s，这里设为10s
+
+//飞控 task
+void flight_task(void *pvParameters);
+#define flight_task_priority 4      //飞控任务和通讯任务是此项目的核心两个任务，他俩的调度应该是"此起彼伏"的(飞控执行一次 然后通讯执行一次 循环)
+#define flight_task_stacksize 128
+#define flight_task_period 6    //根据飞控程序调试的经验得出，是完成pid计算的最小周期时间
 
 
 void Freertos_start(void);

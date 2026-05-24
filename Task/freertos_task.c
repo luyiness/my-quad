@@ -4,11 +4,9 @@
 
 #include "include/freertos_task.h"
 
-#include "ip5305t.h"
-#include "util.h"
-
 TaskHandle_t printf_task_handle;
 TaskHandle_t power_task_handle;
+TaskHandle_t flight_task_handle;
 
 void printf_task(void *pvParameters)
 {
@@ -28,6 +26,17 @@ void power_task(void *pvParameters)
     while (1)
     {
         int_ip5305t_start();
+        vTaskDelayUntil(&tick, power_task_period);
+    }
+}
+
+void flight_task(void *pvParameters)
+{
+    motor_init();
+    uint32_t tick = xTaskGetTickCount();
+    while (1)
+    {
+        motor_start();
         vTaskDelayUntil(&tick, power_task_period);
     }
 }

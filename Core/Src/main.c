@@ -18,17 +18,16 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-
-#include "Com_debug.h"
-#include "delay.h"
-#include "freertos_task.h"
-#include "fsmc_lcd.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "Com_debug.h"
+#include "delay.h"
+#include "freertos_task.h"
+#include "fsmc_lcd.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -93,10 +92,17 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART2_UART_Init();
+  MX_TIM1_Init();
+  MX_TIM2_Init();
+  MX_TIM3_Init();
+  MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
   Debug_Init();
   delay_init(72);
   fsmc_lcd_init();
+
+
+
   Freertos_start();
   /* USER CODE END 2 */
 
@@ -106,9 +112,6 @@ int main(void)
   {
     /* USER CODE END WHILE */
 
-    LED0_TOGGLE();
-    delay_ms(500);
-    LED1_TOGGLE();
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
