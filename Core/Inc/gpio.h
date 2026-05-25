@@ -51,6 +51,19 @@ void MX_GPIO_Init(void);
 #define POWER_KEY_Pin   GPIO_PIN_2
 #define POWER_KEY_GPIO_Port   GPIOB
 
+//灯控系统
+#define L1_Pin   GPIO_PIN_12
+#define L1_GPIO_Port   GPIOA
+
+#define L2_Pin   GPIO_PIN_11
+#define L2_GPIO_Port   GPIOA
+
+#define L3_Pin   GPIO_PIN_15
+#define L3_GPIO_Port   GPIOB
+
+#define L4_Pin   GPIO_PIN_14
+#define L4_GPIO_Port   GPIOB
+
 /******************************************************************************************/
 /* LED端口定义 */
 #define LED0(x)   do{ x ? \

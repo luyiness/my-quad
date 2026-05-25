@@ -71,6 +71,37 @@ void MX_GPIO_Init(void)
     gpio_init_struct.Speed = GPIO_SPEED_FREQ_HIGH;
     HAL_GPIO_Init(POWER_KEY_GPIO_Port, &gpio_init_struct);
     HAL_GPIO_WritePin(POWER_KEY_GPIO_Port, POWER_KEY_Pin, GPIO_PIN_SET);    //初始化=1
+
+    //灯控系统
+    gpio_init_struct.Pin = L1_Pin;
+    gpio_init_struct.Mode = GPIO_MODE_OUTPUT_PP;
+    gpio_init_struct.Pull = GPIO_PULLUP;
+    gpio_init_struct.Speed = GPIO_SPEED_LOW;
+    HAL_GPIO_Init(L1_GPIO_Port, &gpio_init_struct);
+    HAL_GPIO_WritePin(L1_GPIO_Port, L1_Pin, GPIO_PIN_SET);    //初始化=1：就是初始化后灯不亮
+
+    gpio_init_struct.Pin = L2_Pin;
+    gpio_init_struct.Mode = GPIO_MODE_OUTPUT_PP;
+    gpio_init_struct.Pull = GPIO_PULLUP;
+    gpio_init_struct.Speed = GPIO_SPEED_LOW;
+    HAL_GPIO_Init(L2_GPIO_Port, &gpio_init_struct);
+    HAL_GPIO_WritePin(L2_GPIO_Port, L2_Pin, GPIO_PIN_SET);
+
+    gpio_init_struct.Pin = L3_Pin;
+    gpio_init_struct.Mode = GPIO_MODE_OUTPUT_PP;
+    gpio_init_struct.Pull = GPIO_PULLUP;
+    gpio_init_struct.Speed = GPIO_SPEED_LOW;
+    HAL_GPIO_Init(L3_GPIO_Port, &gpio_init_struct);
+    HAL_GPIO_WritePin(L3_GPIO_Port, L3_Pin, GPIO_PIN_SET);
+
+    gpio_init_struct.Pin = L4_Pin;
+    gpio_init_struct.Mode = GPIO_MODE_OUTPUT_PP;
+    gpio_init_struct.Pull = GPIO_PULLUP;
+    gpio_init_struct.Speed = GPIO_SPEED_LOW;
+    HAL_GPIO_Init(L4_GPIO_Port, &gpio_init_struct);
+    HAL_GPIO_WritePin(L4_GPIO_Port, L4_Pin, GPIO_PIN_SET);
+
+
 }
 
 /* USER CODE BEGIN 2 */

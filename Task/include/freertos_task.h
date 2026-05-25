@@ -12,6 +12,7 @@
 #include "ip5305t.h"
 #include "motor.h"
 #include "util.h"
+#include "led.h"
 
 //printf task
 void printf_task(void *pvParameters);
@@ -31,6 +32,11 @@ void flight_task(void *pvParameters);
 #define flight_task_stacksize 128
 #define flight_task_period 6    //根据飞控程序调试的经验得出，是完成pid计算的最小周期时间
 
+//灯控 task
+void led_task(void *pvParameters);
+#define led_task_priority 3
+#define led_task_stacksize 128
+#define led_task_period 50    //相当于灯闪的周期
 
 void Freertos_start(void);
 

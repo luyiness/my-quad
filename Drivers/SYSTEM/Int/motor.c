@@ -16,10 +16,18 @@ void motor_init(void)
     HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
     HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
 
-    Motor_Struct motor_l0 = {.htim = &htim3, .channel = TIM_CHANNEL_1, .speed = 0};
-    Motor_Struct motor_l1 = {&htim4, TIM_CHANNEL_4, 0};
-    Motor_Struct motor_r0 = {&htim2, TIM_CHANNEL_2, 0};
-    Motor_Struct motor_r1 = {&htim1, TIM_CHANNEL_3, 0};
+    motor_l0.htim = &htim3;
+    motor_l0.channel = TIM_CHANNEL_1;
+    motor_l0.speed = 0;
+    motor_l1.htim = &htim4;
+    motor_l1.channel = TIM_CHANNEL_4;
+    motor_l1.speed = 0;
+    motor_r0.htim = &htim2;
+    motor_r0.channel = TIM_CHANNEL_2;
+    motor_r0.speed = 0;
+    motor_r1.htim = &htim1;
+    motor_r1.channel = TIM_CHANNEL_3;
+    motor_r1.speed = 0;
 }
 
 //仅测试使用
