@@ -8,6 +8,7 @@ TaskHandle_t printf_task_handle;
 TaskHandle_t power_task_handle;
 TaskHandle_t flight_task_handle;
 TaskHandle_t led_task_handle;
+TaskHandle_t communicate_task_handle;
 
 void printf_task(void *pvParameters)
 {
@@ -39,7 +40,7 @@ void flight_task(void *pvParameters)
     {
         // motor_start();
         motor_set(&motor_l0);
-        vTaskDelayUntil(&tick, power_task_period);
+        vTaskDelayUntil(&tick, flight_task_period);
     }
 }
 
@@ -83,7 +84,18 @@ void led_task(void *pvParameters)
             led_off(&led4);
             break;
         }
-        vTaskDelayUntil(&tick, power_task_period);
+        vTaskDelayUntil(&tick, led_task_period);
+    }
+}
+
+void communicate_task(void *pvParameters)
+{
+    Int_SI24R1_Init();
+    uint32_t tick = xTaskGetTickCount();
+    while (1)
+    {
+        
+        vTaskDelayUntil(&tick, communicate_task_period);
     }
 }
 
@@ -104,6 +116,10 @@ void Freertos_start(void)
     led_init();
     xTaskCreate(led_task, "led_task", led_task_stacksize, NULL,
         led_task_priority, &led_task_handle);
+
+    //communicate
+    xTaskCreate(communicate_task, "communicate_task", communicate_task_stacksize, NULL,
+        communicate_task_priority, &communicate_task_handle);
 
     vTaskStartScheduler();
 }

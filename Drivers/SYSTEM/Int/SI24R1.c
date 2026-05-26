@@ -178,6 +178,7 @@ void Int_SI24R1_Init(void)
 			return;
 		}
 	}
+	debug_printfln("spi初始化成功");
 
 	//4、进入RX mode
 	Int_SI24R1_RX_Mode();

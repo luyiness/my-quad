@@ -13,6 +13,7 @@
 #include "motor.h"
 #include "util.h"
 #include "led.h"
+#include "SI24R1.h"
 
 //printf task
 void printf_task(void *pvParameters);
@@ -37,6 +38,12 @@ void led_task(void *pvParameters);
 #define led_task_priority 3
 #define led_task_stacksize 128
 #define led_task_period 50    //相当于灯闪的周期
+
+//communication task
+void communicate_task(void *pvParameters);
+#define communicate_task_priority 4
+#define communicate_task_stacksize 128
+#define communicate_task_period 6
 
 void Freertos_start(void);
 
