@@ -64,6 +64,12 @@ void MX_GPIO_Init(void);
 #define L4_Pin   GPIO_PIN_14
 #define L4_GPIO_Port   GPIOB
 
+#define SI24R1_CE_Pin   GPIO_PIN_8        //对应SI24R1的CE引脚
+#define SI24R1_CE_GPIO_Port   GPIOA
+
+#define SI24R1_NSS_Pin   GPIO_PIN_4
+#define SI24R1_NSS_GPIO_Port   GPIOA
+
 /******************************************************************************************/
 /* LED端口定义 */
 #define LED0(x)   do{ x ? \
@@ -79,6 +85,14 @@ HAL_GPIO_WritePin(LED1_GPIO_PORT, LED1_GPIO_PIN, GPIO_PIN_RESET); \
 /* LED取反定义 */
 #define LED0_TOGGLE()   do{ HAL_GPIO_TogglePin(LED0_GPIO_PORT, LED0_GPIO_PIN); }while(0)        /* 翻转LED0 */
 #define LED1_TOGGLE()   do{ HAL_GPIO_TogglePin(LED1_GPIO_PORT, LED1_GPIO_PIN); }while(0)        /* 翻转LED1 */
+
+//spi通讯时，用于拉低/拉高片选
+#define SI24R1_CS_L (HAL_GPIO_WritePin(SI24R1_NSS_GPIO_Port, SI24R1_NSS_Pin, GPIO_PIN_RESET))
+#define SI24R1_CS_H (HAL_GPIO_WritePin(SI24R1_NSS_GPIO_Port, SI24R1_NSS_Pin, GPIO_PIN_SET))
+// SI24R1使能/失能
+#define SI24R1_CE_L (HAL_GPIO_WritePin(SI24R1_CE_GPIO_Port, SI24R1_CE_Pin, GPIO_PIN_RESET))
+#define SI24R1_CE_H (HAL_GPIO_WritePin(SI24R1_CE_GPIO_Port, SI24R1_CE_Pin, GPIO_PIN_SET))
+
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus

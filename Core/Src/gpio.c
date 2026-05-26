@@ -101,7 +101,20 @@ void MX_GPIO_Init(void)
     HAL_GPIO_Init(L4_GPIO_Port, &gpio_init_struct);
     HAL_GPIO_WritePin(L4_GPIO_Port, L4_Pin, GPIO_PIN_SET);
 
+    //SI24R1：PA8——EN使能，PA4——NSS片选
+    gpio_init_struct.Pin = SI24R1_CE_Pin;
+    gpio_init_struct.Mode = GPIO_MODE_OUTPUT_PP;
+    gpio_init_struct.Pull = GPIO_PULLUP;
+    gpio_init_struct.Speed = GPIO_SPEED_LOW;
+    HAL_GPIO_Init(SI24R1_CE_GPIO_Port, &gpio_init_struct);
+    HAL_GPIO_WritePin(SI24R1_CE_GPIO_Port, SI24R1_CE_Pin, GPIO_PIN_RESET);    //EN初始=0
 
+    gpio_init_struct.Pin = SI24R1_NSS_Pin;
+    gpio_init_struct.Mode = GPIO_MODE_OUTPUT_PP;
+    gpio_init_struct.Pull = GPIO_PULLUP;
+    gpio_init_struct.Speed = GPIO_SPEED_HIGH;
+    HAL_GPIO_Init(SI24R1_NSS_GPIO_Port, &gpio_init_struct);
+    HAL_GPIO_WritePin(SI24R1_NSS_GPIO_Port, SI24R1_NSS_Pin, GPIO_PIN_SET);  //NSS初始=1 不片选
 }
 
 /* USER CODE BEGIN 2 */
