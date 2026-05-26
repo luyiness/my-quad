@@ -25,7 +25,7 @@ void printf_task(void *pvParameters);
 void power_task(void *pvParameters);
 #define power_task_priority 3
 #define power_task_stacksize 128
-#define power_task_period 1000      //可设<24s，这里设为10s
+#define power_task_period 10000      //可设<24s，这里设为10s
 
 //飞控 task
 void flight_task(void *pvParameters);

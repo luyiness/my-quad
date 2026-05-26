@@ -6,6 +6,7 @@
 
 // 地址 => 接收方和发送方保持一致
 uint8_t TX_ADDRESS[TX_ADR_WIDTH] = {0x0A, 0x01, 0x07, 0x0E, 0x01}; // 定义一个静态发送地址
+//需要注意的是，地址的最高字节不可设为 0xFF、0x00、0xA5、0x5A、0xAA、0x55，否则可能导致接收失败
 
 //静态方法，用spi读写（交换）一个字节
 static uint8_t SPI_RW(uint8_t byte)
@@ -31,7 +32,7 @@ uint8_t Int_SI24R1_Write_Byte(uint8_t cmd, uint8_t value)
 	return (status);
 }
 
-////SPI发送多个Bytes
+////SPI发送多个Bytes；就是for循环调上面的方法
 uint8_t Int_SI24R1_Write_Bytes(uint8_t cmd, const uint8_t *pBuf, uint8_t bytes)
 {
 	uint8_t status, byte_ctr;
@@ -75,7 +76,8 @@ uint8_t Int_SI24R1_Read_Bytes(uint8_t cmd, uint8_t *pBuf, uint8_t bytes)
 void Int_SI24R1_RX_Mode(void)
 {
 	SI24R1_CE_L;
-	Int_SI24R1_Write_Bytes(SI24R1_WRITE_REG + RX_ADDR_P0, TX_ADDRESS, TX_ADR_WIDTH); // 接收设备接收通道0使用和发送设备相同的发送地址
+	Int_SI24R1_Write_Bytes(SI24R1_WRITE_REG + RX_ADDR_P0, TX_ADDRESS, TX_ADR_WIDTH); // 设置ARQ的地址宽度
+	//						拼接cmd指令：写寄存器RX address pipe0； 写入内容：ARQ的地址； 写入内容的长度：ARQ的地址宽度=5
 	Int_SI24R1_Write_Byte(SI24R1_WRITE_REG + EN_AA, 0x01);							  // 使能接收通道0自动应答
 	Int_SI24R1_Write_Byte(SI24R1_WRITE_REG + EN_RXADDR, 0x01);						  // 使能接收通道0
 	Int_SI24R1_Write_Byte(SI24R1_WRITE_REG + RF_CH, CHANNEL);						  // 选择射频通道
@@ -109,7 +111,8 @@ uint8_t Int_SI24R1_RxPacket(uint8_t *rxbuf)
 {
 	uint8_t state;
 	state = Int_SI24R1_Read_Byte(STATUS);			  // 读取状态寄存器的值
-	Int_SI24R1_Write_Byte(SI24R1_WRITE_REG + STATUS, state); // 清除RX_DS中断标志：RX_DR、TX_DS、MAX_RT位，=1时表示中断发生，往里写1清除此位
+	Int_SI24R1_Write_Byte(SI24R1_WRITE_REG + STATUS, state);	//向状态寄存器写入读到的值；
+	// 清除RX_DS中断标志：RX_DR、TX_DS、MAX_RT位，=1时表示中断发生，往里写1清除此位
 
 	if (state & RX_DR) // 接收到数据
 	{
@@ -132,7 +135,7 @@ uint8_t Int_SI24R1_TxPacket(uint8_t *txbuf)
 	// 	;						// 等待发送完成；没用中断 所以注掉，用下面的while()
 
 	//等待中断标志，直到发送成功或失败：也就是TX_DS=1或MAX_RT=1
-	while (state & (TX_DS | MAX_RT))
+	while ((state & (TX_DS | MAX_RT)) == 0)
 	{
 		state = Int_SI24R1_Read_Byte(STATUS); // 读状态寄存器
 	}

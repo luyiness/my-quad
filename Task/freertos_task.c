@@ -91,10 +91,16 @@ void led_task(void *pvParameters)
 void communicate_task(void *pvParameters)
 {
     Int_SI24R1_Init();
+    uint8_t rx_buffer[32] = {0};
     uint32_t tick = xTaskGetTickCount();
     while (1)
     {
-        
+        uint8_t result = Int_SI24R1_RxPacket(rx_buffer);
+        if (result == 0)
+        {
+            debug_printf("RX: %s", (char*)rx_buffer);
+            memset(rx_buffer, 0, sizeof(rx_buffer));
+        }
         vTaskDelayUntil(&tick, communicate_task_period);
     }
 }
