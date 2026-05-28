@@ -8,7 +8,7 @@ TaskHandle_t printf_task_handle;
 TaskHandle_t power_task_handle;
 TaskHandle_t flight_task_handle;
 TaskHandle_t led_task_handle;
-TaskHandle_t communicate_task_handle;
+TaskHandle_t comm_task_handle;
 
 Remote_Data remote_data = {0};
 
@@ -26,11 +26,22 @@ void printf_task(void *pvParameters)
 void power_task(void *pvParameters)
 {
     //定时启动一次IP5305T，防止自动关机
-    uint32_t tick = xTaskGetTickCount();
+    // uint32_t tick = xTaskGetTickCount();
     while (1)
     {
-        int_ip5305t_start();
-        vTaskDelayUntil(&tick, power_task_period);
+        //当comm task收到了remote_data->shut=1时，会notify power task，在这执行关机；
+        //若等待power_task_period毫秒后 也没若接收comm task的通知 则返回0，反之在power_task_period内收到了通知 则返回1
+        uint32_t value = ulTaskNotifyTake(pdTRUE, power_task_period);
+        if (value == 0) //返回0时 执行：防止自动关机
+        {
+            int_ip5305t_start();
+        }else
+        {
+            debug_printfln("value: %d", value);
+            int_ip5305t_stop();     //关机
+        }
+
+        // vTaskDelayUntil(&tick, power_task_period);
     }
 }
 
@@ -90,14 +101,43 @@ void led_task(void *pvParameters)
     }
 }
 
-void communicate_task(void *pvParameters)
+void comm_task(void *pvParameters)
 {
     Int_SI24R1_Init();
     uint32_t tick = xTaskGetTickCount();
+    uint8_t counter = 0;
     while (1)
     {
-        app_comm_receive_data(&remote_data);
-        vTaskDelayUntil(&tick, communicate_task_period);
+        //接收数据
+        Com_Status receive_status = app_comm_receive_data(&remote_data);
+
+        //判断与remote的连接状态
+        if (receive_status == COM_OK)
+        {
+
+            if (remote_data.shut == 1)    //判断是否关机
+            {
+                xTaskNotifyGive(power_task_handle);     //通知power task
+            }
+
+            counter = 0;
+            remote_status = CONNECTED;
+        } else {
+            counter++;
+            if (counter > 100)
+            {
+                counter = 100;  //防止counter自增太多
+                remote_status = DISCONNECTED;   //若超过100次连接不上，则状态改为DISCONNECTED
+                vTaskDelay(10);
+                continue;
+            }
+        }
+
+
+        //判断飞行状态； 改flight_status
+        
+
+        vTaskDelayUntil(&tick, comm_task_period);
     }
 }
 
@@ -120,8 +160,8 @@ void Freertos_start(void)
         led_task_priority, &led_task_handle);
 
     //communicate
-    xTaskCreate(communicate_task, "communicate_task", communicate_task_stacksize, NULL,
-        communicate_task_priority, &communicate_task_handle);
+    xTaskCreate(comm_task, "comm_task", comm_task_stacksize, NULL,
+        comm_task_priority, &comm_task_handle);
 
     vTaskStartScheduler();
 }

@@ -12,6 +12,6 @@
 #define HEAD_FRAME_1 'B'
 #define HEAD_FRAME_2 'C'
 
-Com_Status app_comm_receive_data(Remote_Data *data);
+Com_Status app_comm_receive_data(Remote_Data *rd);
 
 #endif //QUAD_TEST_APP_COMMUNICATION_H

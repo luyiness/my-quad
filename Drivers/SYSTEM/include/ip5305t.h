@@ -10,5 +10,6 @@
 #include "task.h"
 
 void int_ip5305t_start(void);
+void int_ip5305t_stop(void);
 
 #endif //QUAD_TEST_IP5305T_H

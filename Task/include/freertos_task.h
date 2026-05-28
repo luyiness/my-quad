@@ -41,10 +41,10 @@ void led_task(void *pvParameters);
 #define led_task_period 50    //相当于灯闪的周期
 
 //communication task
-void communicate_task(void *pvParameters);
-#define communicate_task_priority 4
-#define communicate_task_stacksize 128
-#define communicate_task_period 6
+void comm_task(void *pvParameters);
+#define comm_task_priority 4
+#define comm_task_stacksize 128
+#define comm_task_period 6
 
 void Freertos_start(void);
 
