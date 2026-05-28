@@ -10,6 +10,8 @@ TaskHandle_t flight_task_handle;
 TaskHandle_t led_task_handle;
 TaskHandle_t communicate_task_handle;
 
+Remote_Data remote_data = {0};
+
 void printf_task(void *pvParameters)
 {
     uint32_t tick = xTaskGetTickCount();        //获取OS的时间
@@ -91,27 +93,10 @@ void led_task(void *pvParameters)
 void communicate_task(void *pvParameters)
 {
     Int_SI24R1_Init();
-    uint8_t rx_buffer[32] = {0};
-    uint16_t count = 0;     //用于记录有多少次2.4G连接不上
     uint32_t tick = xTaskGetTickCount();
     while (1)
     {
-        uint8_t result = Int_SI24R1_RxPacket(rx_buffer);
-        if (result == 0)
-        {
-            debug_printf("RX: %s", (char*)rx_buffer);
-            memset(rx_buffer, 0, sizeof(rx_buffer));
-            remote_status = CONNECTED;
-            count = 0;
-        } else
-        {
-            count++;
-            if (count > 100)
-            {
-                count = 100;
-                remote_status = DISCONNECTED;   //若超过100次连接不上，则状态改为DISCONNECTED
-            }
-        }
+        app_comm_receive_data(&remote_data);
         vTaskDelayUntil(&tick, communicate_task_period);
     }
 }

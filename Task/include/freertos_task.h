@@ -14,6 +14,7 @@
 #include "util.h"
 #include "led.h"
 #include "SI24R1.h"
+#include "app_communication.h"
 
 //printf task
 void printf_task(void *pvParameters);
