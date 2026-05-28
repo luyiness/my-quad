@@ -50,3 +50,60 @@ Com_Status app_comm_receive_data(Remote_Data *rd)
 
     return COM_OK;
 }
+
+
+//解锁； 就是初始连接时上拉throttle到顶、下拉throttle到底 实现解锁
+Com_Status App_comm_unlock()
+{
+
+}
+
+//状态机：切换flight_status（飞行器的状态）
+void app_comm_connect_status(Remote_Data *rd)
+{
+    switch (flight_status)
+    {
+    case IDLE:
+        if (remote_status == CONNECTED)
+        {
+            Com_Status s = App_comm_unlock();   //解锁
+            if (s == COM_OK)
+            {
+                flight_status = NORMAL;     //IDLE->NORMAL
+            }
+        }
+        break;
+    case NORMAL:
+        if (remote_status == CONNECTED)
+        {
+            if (rd -> fix_height == 1)
+            {
+                flight_status = FIX_HEIGHT;     //NORMAL->FIX_HEIGHT
+            }
+        } else
+        {
+            flight_status = FAULT;     //NORMAL->FAULT
+        }
+        break;
+    case FIX_HEIGHT:
+        if (remote_status == CONNECTED)
+        {
+            if (rd -> fix_height == 0)
+            {
+                flight_status = NORMAL;     //FIX_HEIGHT->NORMAL
+            }
+        } else
+        {
+            flight_status = FAULT;     //FIX_HEIGHT->FAULT
+        }
+        break;
+    case FAULT:
+
+        //TODO 执行故障的逻辑：等待电机缓慢减速至0
+
+        //
+        flight_status = IDLE;       //FAULT->IDLE
+
+        break;
+    }
+}

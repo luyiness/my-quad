@@ -135,7 +135,7 @@ void comm_task(void *pvParameters)
 
 
         //判断飞行状态； 改flight_status
-        
+        app_comm_connect_status(&remote_data);
 
         vTaskDelayUntil(&tick, comm_task_period);
     }
