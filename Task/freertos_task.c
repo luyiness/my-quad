@@ -101,6 +101,8 @@ void led_task(void *pvParameters)
     }
 }
 
+throttle_status_enum thr_status = free;
+
 void comm_task(void *pvParameters)
 {
     Int_SI24R1_Init();

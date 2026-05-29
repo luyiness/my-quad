@@ -27,25 +27,4 @@ void led_off(const led_struct *led);
 void led_toggle(const led_struct *led);
 void led_blink_with_period(led_struct *led, uint16_t period);
 
-//灯语：
-//遥控状态：已连接上遥控，未连接上遥控
-typedef enum
-{
-    CONNECTED,
-    DISCONNECTED,
-}remote_status_enum;
-
-extern remote_status_enum remote_status;
-
-//飞行状态：4个
-typedef enum
-{
-    IDLE,
-    NORMAL,
-    FIX_HEIGHT,
-    FAULT,
-}flight_status_enum;
-
-extern flight_status_enum flight_status;
-
 #endif //QUAD_TEST_LED_H

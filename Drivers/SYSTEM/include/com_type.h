@@ -6,6 +6,27 @@
 #define REMOTE_TEST_COM_TYPE_H
 #include <stdint.h>
 
+//灯语：
+//遥控状态：已连接上遥控，未连接上遥控
+typedef enum
+{
+    CONNECTED,
+    DISCONNECTED,
+}remote_status_enum;
+
+extern remote_status_enum remote_status;
+
+//飞行状态：4个
+typedef enum
+{
+    IDLE,
+    NORMAL,
+    FIX_HEIGHT,
+    FAULT,
+}flight_status_enum;
+
+extern flight_status_enum flight_status;
+
 //遥控数据：yaw,pitch,roll等
 typedef struct
 {
@@ -22,5 +43,17 @@ typedef enum
     COM_OK,
     COM_ERROR,
 }Com_Status;
+
+
+typedef enum
+{
+    free,
+    max,
+    leave_max,
+    min,
+    unlock,
+}throttle_status_enum;
+
+extern throttle_status_enum thr_status;
 
 #endif //REMOTE_TEST_COM_TYPE_H

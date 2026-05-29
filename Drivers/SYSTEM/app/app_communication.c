@@ -51,11 +51,56 @@ Com_Status app_comm_receive_data(Remote_Data *rd)
     return COM_OK;
 }
 
-
+uint32_t at_max_tick = 0;
+uint32_t at_min_tick = 0;
 //解锁； 就是初始连接时上拉throttle到顶、下拉throttle到底 实现解锁
-Com_Status App_comm_unlock()
+Com_Status app_comm_unlock(Remote_Data *rd)
 {
+    switch (thr_status)
+    {
+    case free:
+        if (rd->throttle > 900)
+        {
+            thr_status = max;
+            at_max_tick = xTaskGetTickCount();      //记录进入max状态的时间点
+        }
+        break;
+    case max:       //摇杆保持在max持续1s才能->leave_max，否则->free
+        if (rd->throttle < 900)
+        {
+            if (xTaskGetTickCount() - at_max_tick > 1000)
+            {
+                thr_status = leave_max;
+            }else
+            {
+                thr_status = free;
+            }
+        }
+        break;
+    case leave_max:
+        if (rd->throttle < 100)
+        {
+            thr_status = min;
+            at_min_tick = xTaskGetTickCount();
+        }
+        break;
+    case min:       //摇杆保持在min持续1s才能->unlock，否则->free
+        if (xTaskGetTickCount() - at_max_tick < 1000)
+        {
+            if (rd->throttle > 100)
+            {
+                thr_status = free;
+            }
+        }else
+        {
+            thr_status = unlock;
+        }
+        break;
 
+    case unlock:
+        return COM_OK;
+    }
+    return COM_ERROR;
 }
 
 //状态机：切换flight_status（飞行器的状态）
@@ -66,7 +111,7 @@ void app_comm_connect_status(Remote_Data *rd)
     case IDLE:
         if (remote_status == CONNECTED)
         {
-            Com_Status s = App_comm_unlock();   //解锁
+            Com_Status s = app_comm_unlock(rd);   //解锁
             if (s == COM_OK)
             {
                 flight_status = NORMAL;     //IDLE->NORMAL
@@ -103,7 +148,7 @@ void app_comm_connect_status(Remote_Data *rd)
 
         //
         flight_status = IDLE;       //FAULT->IDLE
-
+        thr_status = free;      //油门状态改成空闲
         break;
     }
 }

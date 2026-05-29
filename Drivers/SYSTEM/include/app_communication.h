@@ -17,4 +17,6 @@ Com_Status app_comm_receive_data(Remote_Data *rd);
 
 void app_comm_connect_status(Remote_Data *rd);
 
+Com_Status app_comm_unlock(Remote_Data *rd);
+
 #endif //QUAD_TEST_APP_COMMUNICATION_H
