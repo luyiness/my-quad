@@ -144,8 +144,8 @@ void app_comm_connect_status(Remote_Data *rd)
         break;
     case FAULT:
 
-        //TODO 执行故障的逻辑：等待电机缓慢减速至0
-
+        //在motor task中执行故障的逻辑：等待电机缓慢减速至0； 等待通知
+        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
         //
         flight_status = IDLE;       //FAULT->IDLE
         thr_status = free;      //油门状态改成空闲

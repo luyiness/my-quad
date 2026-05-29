@@ -51,8 +51,8 @@ void flight_task(void *pvParameters)
     uint32_t tick = xTaskGetTickCount();
     while (1)
     {
-        // motor_start();
-        motor_set(&motor_l0);
+        //根据PID + 摇杆数据 + flight_status 控制电机转速
+        app_flight_set_motors(&remote_data);
         vTaskDelayUntil(&tick, flight_task_period);
     }
 }
