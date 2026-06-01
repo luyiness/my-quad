@@ -10,6 +10,8 @@ static int16_t right_top = 0;
 static int16_t right_down = 0;
 static int16_t left_down = 0;
 
+static int8_t scale = 10;       //比例系数；用于减少摇杆对yaw roll pitch的变化
+
 void app_flight_set_motors(Remote_Data *rd)
 {
     switch (flight_status)
@@ -21,11 +23,45 @@ void app_flight_set_motors(Remote_Data *rd)
         left_down = 0;
         break;
     case NORMAL:
+        left_top = 0;
+        right_top = 0;
+        right_down = 0;
+        left_down = 0;
+
+        //往前飞的话：pitch增加 也就是left_down和right_down转速增加
+        left_top -= rd->pitch - 500;
+        right_top -= rd->pitch - 500;
+        left_down += rd->pitch - 500;
+        right_down += rd->pitch - 500;
+
+        //向右横滚的话：roll增加 也就是left_up和left_down转速增加
+        left_top += rd->roll - 500;
+        right_top -= rd->roll- 500;
+        left_down += rd->roll - 500;
+        right_down -= rd->roll - 500;
+
+        //向右偏航的话：yaw增加 也就是right_top和left_down转速增加
+        left_top -= rd->yaw - 500;
+        right_top += rd->yaw- 500;
+        left_down += rd->yaw - 500;
+        right_down -= rd->yaw - 500;
+
+        //按比例缩小：
+        left_top = left_top / scale;
+        right_top = right_top / scale;
+        left_down = left_down / scale;
+        right_down = right_down / scale;
+
         //暂时，电机转速直接=油门大小
-        left_top = rd->throttle;
-        right_top = rd->throttle;
-        right_down = rd->throttle;
-        left_down = rd->throttle;
+        left_top += rd->throttle;
+        right_top += rd->throttle;
+        right_down += rd->throttle;
+        left_down += rd->throttle;
+
+        //补偿：根据实际情况进行细微调整
+        // right_down += 20;
+        //...
+
         break;
     case FIX_HEIGHT:
         //todo
