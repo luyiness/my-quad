@@ -37,6 +37,7 @@ set(MX_Application_Src
 	${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/retarget.c
 	${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/delay.c
 	${CMAKE_CURRENT_SOURCE_DIR}/../../Task/freertos_task.c
+	${CMAKE_CURRENT_SOURCE_DIR}/../../Core/Src/i2c.c
 )
 
 # STM32 HAL/LL Drivers
@@ -59,6 +60,7 @@ set(STM32_Drivers_Src
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_sram.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_fsmc.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_spi.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_i2c.c
 )
 
 # Drivers Midllewares
