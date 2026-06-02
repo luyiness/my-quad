@@ -77,4 +77,11 @@ typedef struct
     Accel_Data accel;
 }Gyroscope_Data;
 
+typedef struct
+{
+    float yaw;
+    float pitch;
+    float roll;
+}EulerAngle_Struct;
+
 #endif //REMOTE_TEST_COM_TYPE_H

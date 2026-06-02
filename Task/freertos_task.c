@@ -46,6 +46,7 @@ void power_task(void *pvParameters)
 }
 
 Gyroscope_Data gyroscope_data = {0};
+EulerAngle_Struct euler_angle = {0};
 
 void flight_task(void *pvParameters)
 {
@@ -55,6 +56,9 @@ void flight_task(void *pvParameters)
     {
         //读取mpu数据
         app_flight_get_gyroscope(&gyroscope_data);
+
+        //姿态解算，获取欧拉角
+        App_Flight_Get_EulerAngle(&gyroscope_data, &euler_angle, flight_task_period / 1000.0);
 
         //根据PID + 摇杆数据 + flight_status 控制电机转速
         app_flight_set_motors(&remote_data);

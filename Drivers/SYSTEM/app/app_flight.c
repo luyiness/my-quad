@@ -134,3 +134,10 @@ void app_flight_get_gyroscope(Gyroscope_Data *gd)
     gd->accel.z = (int16_t)Com_Filter_KalmanFilter(&kfs[2], gd->accel.z);
 
 }
+
+void App_Flight_Get_EulerAngle(Gyroscope_Data* gd, EulerAngle_Struct* ea, float dt)
+{
+    Com_IMU_GetEulerAngle(gd, ea, dt);
+    
+    debug_printfln("euler:%f,%f,%f",ea->yaw,ea->pitch,ea->roll);
+}
