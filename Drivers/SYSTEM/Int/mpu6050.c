@@ -52,22 +52,93 @@ void mpu6050_init(void)
     // uint8_t id;
     // mpu6050_read_byte(MPU_DEVICE_ID_REG, &id);
     // debug_printf("MPU6050 ID: %02X\n", id);     //“%X”表示输出16进制格式，“02”表示最小输出宽度=2、小于2的话补0
+
+    calibrate_gyroscope_data();
 }
 
+static gyroscope_data gd_calibration_data;     //偏移量，用于校准
 
-void read_gyroscope_data(gyroscope_data *gd)
+void mpu6050_read_gyro_data(gyro_data *gd)
 {
     //Gyro
     uint8_t data[6] = {0};
     mpu6050_read_bytes(MPU_GYRO_XOUTH_REG, data, 6);    //从MPU_GYRO_XOUTH_REG读到MPU_GYRO_ZOUTL_REG，共6个registers
-    gd->gyro.x = (int16_t)(data[0] << 8 | data[1]);     //(注意这里转换不转换都行，因为获取到的数据就是有正负的（最高位=1的表示负数）)
-    gd->gyro.y = (int16_t)(data[2] << 8 | data[3]);
-    gd->gyro.z = (int16_t)(data[4] << 8 | data[5]);
+    gd->x = (int16_t)(data[0] << 8 | data[1]);     //(注意这里转换不转换都行，因为获取到的数据就是有正负的（最高位=1的表示负数）)
+    gd->y = (int16_t)(data[2] << 8 | data[3]);
+    gd->z = (int16_t)(data[4] << 8 | data[5]);
+}
 
+void mpu6050_read_accel_data(accel_data *ga)
+{
     //Accel
-    uint8_t data2[6] = {0};
-    mpu6050_read_bytes(MPU_ACCEL_XOUTH_REG, data2, 6);
-    gd->accel.x = (int16_t)(data2[0] << 8 | data2[1]);
-    gd->accel.y = (int16_t)(data2[2] << 8 | data2[3]);
-    gd->accel.z = (int16_t)(data2[4] << 8 | data2[5]);
+    uint8_t data[6] = {0};
+    mpu6050_read_bytes(MPU_ACCEL_XOUTH_REG, data, 6);
+    ga->x = (int16_t)(data[0] << 8 | data[1]);
+    ga->y = (int16_t)(data[2] << 8 | data[3]);
+    ga->z = (int16_t)(data[4] << 8 | data[5]);
+}
+
+void read_gyroscope_data(gyroscope_data *gd)
+{
+    mpu6050_read_gyro_data(&gd->gyro);
+    mpu6050_read_accel_data(&gd->accel);
+
+
+    //calibration
+    gd->gyro.x -= gd_calibration_data.gyro.x;
+    gd->gyro.y -= gd_calibration_data.gyro.y;
+    gd->gyro.z -= gd_calibration_data.gyro.z;
+    gd->accel.x -= gd_calibration_data.accel.x;
+    gd->accel.y -= gd_calibration_data.accel.y;
+    gd->accel.z -= gd_calibration_data.accel.z;
+}
+
+
+//零偏校准 （只在初始化中调用一次）
+//偏移量获取：飞机启动后 判断飞机的连续100次采集的gyroscope数据稳定（波动量<100），然后计算偏移量=100次的平均值
+void calibrate_gyroscope_data(void)
+{
+    //1、判断飞机的连续100次采集的gyroscope数据稳定（波动量<100）
+    uint8_t count = 0;
+    gyro_data last_gyro;
+    gyro_data current_gyro;
+    mpu6050_read_gyro_data(&last_gyro);
+    while (count < 100)
+    {
+        HAL_Delay(2);       //防止采集间隔太小
+        mpu6050_read_gyro_data(&current_gyro);
+        if (ABS(last_gyro.x - current_gyro.x) < 100 &&
+            ABS(last_gyro.y - current_gyro.y) < 100 &&
+            ABS(last_gyro.z - current_gyro.z) < 100)
+        {
+            count++;
+        }else
+        {
+            count=0;
+        }
+        last_gyro = current_gyro;     //结构体变量相互赋值、就相当于其中每个属性赋值
+    }
+
+    //2、计算100次采集的gyro、accel的平均值 作为偏移量
+    int32_t array[6] = {0};
+    gyroscope_data gd_temp = {0};
+    for (uint8_t i = 0; i < 100; i++)
+    {
+        HAL_Delay(2);       //防止采集间隔太小
+        mpu6050_read_gyro_data(&gd_temp.gyro);
+        mpu6050_read_accel_data(&gd_temp.accel);
+        array[0] += gd_temp.gyro.x;
+        array[1] += gd_temp.gyro.y;
+        array[2] += gd_temp.gyro.z;
+        array[3] += gd_temp.accel.x;
+        array[4] += gd_temp.accel.y;
+        array[5] += gd_temp.accel.z;
+    }
+    gd_calibration_data.gyro.x = (int16_t)(array[0] / 100);
+    gd_calibration_data.gyro.y = (int16_t)(array[1] / 100);
+    gd_calibration_data.gyro.z = (int16_t)(array[2] / 100);
+    gd_calibration_data.accel.x = (int16_t)(array[3] / 100);
+    gd_calibration_data.accel.y = (int16_t)(array[4] / 100);
+    gd_calibration_data.accel.z = (int16_t)(array[5] / 100);
+    gd_calibration_data.accel.z -= 16384;       //gravity （意思就是accel.z校准成16384）
 }

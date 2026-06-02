@@ -80,6 +80,8 @@
 #define MPU_FIFO_RW_REG      0X74 // FIFO读写寄存器
 #define MPU_DEVICE_ID_REG    0X75 // 器件ID寄存器
 
+#define ABS(x) ((x)>0 ? (x):-(x))      //求一个数的绝对值
+
 void mpu6050_init(void);
 
 void read_gyroscope_data(gyroscope_data *gyro);
@@ -89,5 +91,7 @@ void mpu6050_write_byte(uint8_t reg, uint8_t data);
 void mpu6050_read_byte(uint8_t reg, uint8_t *data);
 
 void mpu6050_read_bytes(uint8_t reg, uint8_t *data, uint8_t len);
+
+void calibrate_gyroscope_data(void);
 
 #endif //QUAD_TEST_MPU6050_H
