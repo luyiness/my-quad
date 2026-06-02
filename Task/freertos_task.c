@@ -45,12 +45,17 @@ void power_task(void *pvParameters)
     }
 }
 
+Gyroscope_Data gyroscope_data = {0};
+
 void flight_task(void *pvParameters)
 {
     motor_init();
     uint32_t tick = xTaskGetTickCount();
     while (1)
     {
+        //读取mpu数据
+        app_flight_get_gyroscope(&gyroscope_data);
+
         //根据PID + 摇杆数据 + flight_status 控制电机转速
         app_flight_set_motors(&remote_data);
         vTaskDelayUntil(&tick, flight_task_period);

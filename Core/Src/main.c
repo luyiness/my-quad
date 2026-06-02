@@ -30,6 +30,7 @@
 #include "delay.h"
 #include "freertos_task.h"
 #include "fsmc_lcd.h"
+#include "mpu6050.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -105,7 +106,7 @@ int main(void)
   delay_init(72);
   fsmc_lcd_init();
 
-
+  mpu6050_init();
 
   Freertos_start();
   /* USER CODE END 2 */

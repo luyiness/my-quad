@@ -62,19 +62,19 @@ typedef struct
     int16_t x;
     int16_t y;
     int16_t z;
-}gyro_data;     //角速度angular velocity
+}Gyro_Data;     //角速度angular velocity
 
 typedef struct
 {
     int16_t x;
     int16_t y;
     int16_t z;
-}accel_data;    //加速度acceleration
+}Accel_Data;    //加速度acceleration
 
 typedef struct
 {
-    gyro_data gyro;
-    accel_data accel;
-}gyroscope_data;
+    Gyro_Data gyro;
+    Accel_Data accel;
+}Gyroscope_Data;
 
 #endif //REMOTE_TEST_COM_TYPE_H

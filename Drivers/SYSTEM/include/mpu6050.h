@@ -84,7 +84,7 @@
 
 void mpu6050_init(void);
 
-void read_gyroscope_data(gyroscope_data *gyro);
+void read_gyroscope_data(Gyroscope_Data *gyro);
 
 void mpu6050_write_byte(uint8_t reg, uint8_t data);
 

@@ -113,3 +113,24 @@ void app_flight_set_motors(Remote_Data *rd)
 
     motor_setAll(left_top,left_down,right_top,right_down);
 }
+
+static Gyro_Data g_last;
+
+void app_flight_get_gyroscope(Gyroscope_Data *gd)
+{
+    taskENTER_CRITICAL();       //进入临界区
+    read_gyroscope_data(gd);
+    taskEXIT_CRITICAL();
+
+    //对gyro_data进行一阶低通滤波
+    gd->gyro.x = Com_Filter_LowPass(gd->gyro.x, g_last.x);
+    gd->gyro.y = Com_Filter_LowPass(gd->gyro.y, g_last.y);
+    gd->gyro.z = Com_Filter_LowPass(gd->gyro.z, g_last.z);
+    g_last = gd->gyro;
+
+    //对accel_data进行卡尔曼滤波
+    gd->accel.x = (int16_t)Com_Filter_KalmanFilter(&kfs[0], gd->accel.x);
+    gd->accel.y = (int16_t)Com_Filter_KalmanFilter(&kfs[1], gd->accel.y);
+    gd->accel.z = (int16_t)Com_Filter_KalmanFilter(&kfs[2], gd->accel.z);
+
+}

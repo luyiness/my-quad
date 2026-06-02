@@ -56,9 +56,9 @@ void mpu6050_init(void)
     calibrate_gyroscope_data();
 }
 
-static gyroscope_data gd_calibration_data;     //偏移量，用于校准
+static Gyroscope_Data gd_calibration_data;     //偏移量，用于校准
 
-void mpu6050_read_gyro_data(gyro_data *gd)
+void mpu6050_read_gyro_data(Gyro_Data *gd)
 {
     //Gyro
     uint8_t data[6] = {0};
@@ -68,7 +68,7 @@ void mpu6050_read_gyro_data(gyro_data *gd)
     gd->z = (int16_t)(data[4] << 8 | data[5]);
 }
 
-void mpu6050_read_accel_data(accel_data *ga)
+void mpu6050_read_accel_data(Accel_Data *ga)
 {
     //Accel
     uint8_t data[6] = {0};
@@ -78,7 +78,7 @@ void mpu6050_read_accel_data(accel_data *ga)
     ga->z = (int16_t)(data[4] << 8 | data[5]);
 }
 
-void read_gyroscope_data(gyroscope_data *gd)
+void read_gyroscope_data(Gyroscope_Data *gd)
 {
     mpu6050_read_gyro_data(&gd->gyro);
     mpu6050_read_accel_data(&gd->accel);
@@ -100,8 +100,8 @@ void calibrate_gyroscope_data(void)
 {
     //1、判断飞机的连续100次采集的gyroscope数据稳定（波动量<100）
     uint8_t count = 0;
-    gyro_data last_gyro;
-    gyro_data current_gyro;
+    Gyro_Data last_gyro;
+    Gyro_Data current_gyro;
     mpu6050_read_gyro_data(&last_gyro);
     while (count < 100)
     {
@@ -121,7 +121,7 @@ void calibrate_gyroscope_data(void)
 
     //2、计算100次采集的gyro、accel的平均值 作为偏移量
     int32_t array[6] = {0};
-    gyroscope_data gd_temp = {0};
+    Gyroscope_Data gd_temp = {0};
     for (uint8_t i = 0; i < 100; i++)
     {
         HAL_Delay(2);       //防止采集间隔太小
