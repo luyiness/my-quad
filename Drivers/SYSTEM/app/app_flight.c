@@ -141,3 +141,36 @@ void App_Flight_Get_EulerAngle(Gyroscope_Data* gd, EulerAngle_Struct* ea, float 
     
     debug_printfln("euler:%f,%f,%f",ea->yaw,ea->pitch,ea->roll);
 }
+
+//pid
+PID_Struct pid_pitch = {.kp=0.0f,.ki=0.0f,.kd=0.0f};        //pitch角
+PID_Struct pid_pitch_gyro = {.kp=0.0f,.ki=0.0f,.kd=0.0f};   //pitch的角速度，就是以y为轴转的速度
+
+PID_Struct pid_roll = {.kp=0.0f,.ki=0.0f,.kd=0.0f};         //roll
+PID_Struct pid_roll_gyro = {.kp=0.0f,.ki=0.0f,.kd=0.0f};    //roll的角速度，就是以x为轴转的速度
+
+PID_Struct pid_yaw = {.kp=0.0f,.ki=0.0f,.kd=0.0f};          //yaw
+PID_Struct pid_yaw_gyro = {.kp=0.0f,.ki=0.0f,.kd=0.0f};
+
+//pid计算
+void App_Flight_PID(Gyroscope_Data* gd, EulerAngle_Struct* ea, Remote_Data *rd, float dt)
+{
+    //一共pitch roll yaw 三个Cascade PID control system
+    //1、pitch
+    pid_pitch.desire = (rd->pitch - 500) * 0.02;      //外环目标值 是摇杆数字量，但需限定一下范围（因为摇杆的数字量不动时=500、动时几百的波动 太大）
+    pid_pitch.measure = ea->pitch;      //外环测量值 是姿态解算的角度
+    pid_pitch_gyro.measure = gd->gyro.y * Gyro_G;     //内环测量值 是y轴角速度，需转成度/s
+    com_pid_cascade(&pid_pitch, &pid_pitch_gyro, dt);
+
+    //2、roll
+    pid_roll.desire = (rd->roll - 500) * 0.02;
+    pid_roll.measure = ea->roll;
+    pid_roll_gyro.measure = gd->gyro.x * Gyro_G;
+    com_pid_cascade(&pid_roll, &pid_roll_gyro, dt);
+
+    //3、yaw
+    pid_yaw.desire = (rd->yaw - 500) * 0.02;
+    pid_yaw.measure = ea->yaw;
+    pid_yaw_gyro.measure = gd->gyro.z * Gyro_G;
+    com_pid_cascade(&pid_yaw, &pid_yaw_gyro, dt);
+}
