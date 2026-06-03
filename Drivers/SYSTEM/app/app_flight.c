@@ -12,6 +12,16 @@ static int16_t left_down = 0;
 
 static int8_t scale = 10;       //比例系数；用于减少摇杆对yaw roll pitch的变化
 
+//pid
+static PID_Struct pid_pitch = {.kp=0.0f,.ki=0.0f,.kd=0.0f};        //pitch角
+static PID_Struct pid_pitch_gyro = {.kp=0.0f,.ki=0.0f,.kd=0.0f};   //pitch的角速度，就是以y为轴转的速度
+
+static PID_Struct pid_roll = {.kp=0.0f,.ki=0.0f,.kd=0.0f};         //roll
+static PID_Struct pid_roll_gyro = {.kp=0.0f,.ki=0.0f,.kd=0.0f};    //roll的角速度，就是以x为轴转的速度
+
+static PID_Struct pid_yaw = {.kp=0.0f,.ki=0.0f,.kd=0.0f};          //yaw
+static PID_Struct pid_yaw_gyro = {.kp=0.0f,.ki=0.0f,.kd=0.0f};
+
 void app_flight_set_motors(Remote_Data *rd)
 {
     switch (flight_status)
@@ -23,6 +33,7 @@ void app_flight_set_motors(Remote_Data *rd)
         left_down = 0;
         break;
     case NORMAL:
+        /**
         left_top = 0;
         right_top = 0;
         right_down = 0;
@@ -61,6 +72,36 @@ void app_flight_set_motors(Remote_Data *rd)
         //补偿：根据实际情况进行细微调整
         // right_down += 20;
         //...
+        */
+
+        left_top = LIMIT(rd->throttle, 0, 800);     //防止油门拉的太高导致PID失效
+        right_top = LIMIT(rd->throttle, 0, 800);
+        right_down = LIMIT(rd->throttle, 0, 800);
+        left_down = LIMIT(rd->throttle, 0, 800);
+
+        //pitch         //注意这些正负号：pitch角要增大的话是:--++（output为正数），pitch角要减小的话是++--，只有这两种情况！
+        left_top -= pid_pitch_gyro.output;
+        right_top -= pid_pitch_gyro.output;
+        left_down += pid_pitch_gyro.output;
+        right_down += pid_pitch_gyro.output;
+
+        //roll          //+-+- or -+-+
+        left_top += pid_roll_gyro.output;
+        right_top -= pid_roll_gyro.output;
+        left_down += pid_roll_gyro.output;
+        right_down -= pid_roll_gyro.output;
+
+        //roll          //-++- or +--+
+        left_top -= pid_yaw_gyro.output;
+        right_top += pid_yaw_gyro.output;
+        left_down += pid_yaw_gyro.output;
+        right_down -= pid_yaw_gyro.output;
+
+        //
+        left_top = LIMIT(left_top, 0, 1000);
+        right_top = LIMIT(right_top, 0, 1000);
+        right_down = LIMIT(right_down, 0, 1000);
+        left_down = LIMIT(left_down, 0, 1000);
 
         break;
     case FIX_HEIGHT:
@@ -94,22 +135,22 @@ void app_flight_set_motors(Remote_Data *rd)
     }
 
     //安全停机； 要停机时的PID计算转速减小的慢、这代码是让转速快速=0
-    if (left_top < 20)
-    {
-        left_top =0;
-    }
-    if (right_top < 20)
-    {
-        right_top =0;
-    }
-    if (right_down < 20)
-    {
-        right_down =0;
-    }
-    if (left_down < 20)
-    {
-        left_down =0;
-    }
+    // if (left_top < 20)
+    // {
+    //     left_top =0;
+    // }
+    // if (right_top < 20)
+    // {
+    //     right_top =0;
+    // }
+    // if (right_down < 20)
+    // {
+    //     right_down =0;
+    // }
+    // if (left_down < 20)
+    // {
+    //     left_down =0;
+    // }
 
     motor_setAll(left_top,left_down,right_top,right_down);
 }
@@ -142,15 +183,6 @@ void App_Flight_Get_EulerAngle(Gyroscope_Data* gd, EulerAngle_Struct* ea, float 
     debug_printfln("euler:%f,%f,%f",ea->yaw,ea->pitch,ea->roll);
 }
 
-//pid
-PID_Struct pid_pitch = {.kp=0.0f,.ki=0.0f,.kd=0.0f};        //pitch角
-PID_Struct pid_pitch_gyro = {.kp=0.0f,.ki=0.0f,.kd=0.0f};   //pitch的角速度，就是以y为轴转的速度
-
-PID_Struct pid_roll = {.kp=0.0f,.ki=0.0f,.kd=0.0f};         //roll
-PID_Struct pid_roll_gyro = {.kp=0.0f,.ki=0.0f,.kd=0.0f};    //roll的角速度，就是以x为轴转的速度
-
-PID_Struct pid_yaw = {.kp=0.0f,.ki=0.0f,.kd=0.0f};          //yaw
-PID_Struct pid_yaw_gyro = {.kp=0.0f,.ki=0.0f,.kd=0.0f};
 
 //pid计算
 void App_Flight_PID(Gyroscope_Data* gd, EulerAngle_Struct* ea, Remote_Data *rd, float dt)

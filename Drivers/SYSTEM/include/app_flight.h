@@ -14,6 +14,8 @@
 #include "com_imu.h"
 #include "com_pid.h"
 
+#define LIMIT(a,min,max) (a > max ? max : (a < min ? min : a))
+
 void app_flight_set_motors(Remote_Data *rd);
 
 extern TaskHandle_t comm_task_handle;
