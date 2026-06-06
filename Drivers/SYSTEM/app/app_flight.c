@@ -135,6 +135,31 @@ void app_flight_set_motors(Remote_Data *rd)
     }
 
     //安全停机； 要停机时的PID计算转速减小的慢、这代码是让转速快速=0
+    if (rd->throttle < 30)
+    {
+        left_top = 0;
+        right_top = 0;
+        right_down = 0;
+        left_down = 0;
+    }
+
+    if (left_top > 100)
+    {
+        left_top = 100;
+    }
+    if (right_top > 100)
+    {
+        right_top = 100;
+    }
+    if (right_down > 100)
+    {
+        right_down = 100;
+    }
+    if (left_down > 100)
+    {
+        left_down = 100;
+    }
+
     // if (left_top < 20)
     // {
     //     left_top =0;
@@ -189,7 +214,7 @@ void App_Flight_PID(Gyroscope_Data* gd, EulerAngle_Struct* ea, Remote_Data *rd, 
 {
     //一共pitch roll yaw 三个Cascade PID control system
     //1、pitch
-    pid_pitch.desire = (rd->pitch - 500) * 0.02;      //外环目标值 是摇杆数字量，但需限定一下范围（因为摇杆的数字量不动时=500、动时几百的波动 太大）
+    pid_pitch.desire = (rd->pitch - 500) * 0.02;      //外环目标值 是摇杆数字量，但需限定一下范围 也是转换成角度（因为摇杆的数字量不动时=500、动时几百的波动 太大）
     pid_pitch.measure = ea->pitch;      //外环测量值 是姿态解算的角度
     pid_pitch_gyro.measure = gd->gyro.y * Gyro_G;     //内环测量值 是y轴角速度，需转成度/s
     com_pid_cascade(&pid_pitch, &pid_pitch_gyro, dt);
