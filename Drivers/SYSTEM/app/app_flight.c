@@ -22,6 +22,10 @@ static PID_Struct pid_roll_gyro = {.kp=0.0f,.ki=0.0f,.kd=0.0f};    //roll的角�
 static PID_Struct pid_yaw = {.kp=0.0f,.ki=0.0f,.kd=0.0f};          //yaw
 static PID_Struct pid_yaw_gyro = {.kp=0.0f,.ki=0.0f,.kd=0.0f};
 
+//定高PID参数
+static PID_Struct pid_height = {.kp=0.0f,.ki=0.0f,.kd=0.0f};
+static PID_Struct pid_z_velocity = {.kp=0.0f,.ki=0.0f,.kd=0.0f};
+
 void app_flight_set_motors(Remote_Data *rd)
 {
     switch (flight_status)
@@ -33,6 +37,7 @@ void app_flight_set_motors(Remote_Data *rd)
         left_down = 0;
         break;
     case NORMAL:
+    case FIX_HEIGHT:
         /**
         left_top = 0;
         right_top = 0;
@@ -97,6 +102,15 @@ void app_flight_set_motors(Remote_Data *rd)
         left_down += pid_yaw_gyro.output;
         right_down -= pid_yaw_gyro.output;
 
+        //四个电机同时加/减速、来改变高度
+        if (flight_status == FIX_HEIGHT)
+        {
+            left_top += LIMIT(pid_z_velocity.output, -150, 150);
+            right_top += LIMIT(pid_z_velocity.output, -150, 150);
+            right_down += LIMIT(pid_z_velocity.output, -150, 150);
+            left_down += LIMIT(pid_z_velocity.output, -150, 150);
+        }
+
         //
         left_top = LIMIT(left_top, 0, 1000);
         right_top = LIMIT(right_top, 0, 1000);
@@ -104,9 +118,9 @@ void app_flight_set_motors(Remote_Data *rd)
         left_down = LIMIT(left_down, 0, 1000);
 
         break;
-    case FIX_HEIGHT:
-        //todo
-        break;
+    // case FIX_HEIGHT:
+    //     //todo
+    //     break;
     case FAULT:
         //电机转速缓慢降低
         if (left_top > 10)
@@ -230,4 +244,28 @@ void App_Flight_PID(Gyroscope_Data* gd, EulerAngle_Struct* ea, Remote_Data *rd, 
     pid_yaw.measure = ea->yaw;
     pid_yaw_gyro.measure = gd->gyro.z * Gyro_G;
     com_pid_cascade(&pid_yaw, &pid_yaw_gyro, dt);
+}
+
+//定高相关：
+static uint16_t last_height = 0;
+static float last_velocity = 0.0f;
+
+void app_flight_height_pid(uint16_t current_height, uint16_t desired_height, float dt)
+{
+    //1、外环：用高度计算
+    pid_height.desire = desired_height;
+    pid_height.measure = current_height;
+
+    //2、内环 ；用速度计算
+    ///方法一：用一个dt时间的距离 / dt
+    // float z_velocity = (current_height - last_height) / dt;
+    //方法二：用6500获取到z轴加速度z_acc，当前速度就 = last_velocity + z_acc * dt
+    float z_acc = Com_IMU_GetNormAccZ() - 16384;    //16384就是默认情况下z轴加速度：就是重力g
+    float z_velocity = last_velocity + z_acc * dt;
+
+    last_velocity = z_velocity;
+    pid_z_velocity.measure = z_velocity;
+
+    //3、
+    com_pid_cascade(&pid_height, &pid_z_velocity, dt);
 }

@@ -47,7 +47,7 @@ typedef enum
 
 typedef enum
 {
-    free,
+    FREE,       //大写是因为有冲突：Ambiguous symbol 'free'
     max,
     leave_max,
     min,

@@ -7,6 +7,8 @@
 uint8_t rx_buffer[TX_PLOAD_WIDTH] = {0};
 uint32_t checksum = 0;
 const uint8_t TAIL = TX_PLOAD_WIDTH - 4;
+extern uint16_t flight_current_height;
+extern uint16_t flight_desired_height;
 
 Com_Status app_comm_receive_data(Remote_Data *rd)
 {
@@ -58,7 +60,7 @@ Com_Status app_comm_unlock(Remote_Data *rd)
 {
     switch (thr_status)
     {
-    case free:
+    case FREE:
         if (rd->throttle > 900)
         {
             thr_status = max;
@@ -73,7 +75,7 @@ Com_Status app_comm_unlock(Remote_Data *rd)
                 thr_status = leave_max;
             }else
             {
-                thr_status = free;
+                thr_status = FREE;
             }
         }
         break;
@@ -89,7 +91,7 @@ Com_Status app_comm_unlock(Remote_Data *rd)
         {
             if (rd->throttle > 100)
             {
-                thr_status = free;
+                thr_status = FREE;
             }
         }else
         {
@@ -121,9 +123,10 @@ void app_comm_connect_status(Remote_Data *rd)
     case NORMAL:
         if (remote_status == CONNECTED)
         {
-            if (rd -> fix_height == 1)
+            if (rd -> fix_height == 1)      //按一下fix_height key，进入定高状态
             {
                 flight_status = FIX_HEIGHT;     //NORMAL->FIX_HEIGHT
+                flight_desired_height = flight_current_height;  //记录当前高度
             }
         } else
         {
@@ -133,7 +136,7 @@ void app_comm_connect_status(Remote_Data *rd)
     case FIX_HEIGHT:
         if (remote_status == CONNECTED)
         {
-            if (rd -> fix_height == 0)
+            if (rd -> fix_height == 1)      //再按一下fix_height key，退出定高状态
             {
                 flight_status = NORMAL;     //FIX_HEIGHT->NORMAL
             }
@@ -148,7 +151,7 @@ void app_comm_connect_status(Remote_Data *rd)
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
         //
         flight_status = IDLE;       //FAULT->IDLE
-        thr_status = free;      //油门状态改成空闲
+        thr_status = FREE;      //油门状态改成空闲
         break;
     }
 }

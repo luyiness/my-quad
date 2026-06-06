@@ -70,4 +70,5 @@ void vl53l1x_init(void)
 void vl53l1x_getDistance(uint16_t* distance)
 {
 	VL53L1X_GetDistance(DEV_ADDR, distance);	//distance，16位，单位mm
+	// debug_printf("distance: %X\n", *distance);
 }

@@ -48,9 +48,13 @@ void power_task(void *pvParameters)
 Gyroscope_Data gyroscope_data = {0};
 EulerAngle_Struct euler_angle = {0};
 
+uint16_t flight_current_height = 0;
+uint16_t flight_desired_height = 0;
+
 void flight_task(void *pvParameters)
 {
     motor_init();
+    vl53l1x_init();
     uint32_t tick = xTaskGetTickCount();
     while (1)
     {
@@ -62,6 +66,14 @@ void flight_task(void *pvParameters)
 
         //PID计算; (将当前角度和角速度输入，经pid计算 得到目标角度和角速度（放在了PID_Struct变量.output中）)
         App_Flight_PID(&gyroscope_data, &euler_angle, &remote_data, flight_task_period / 1000.0);
+
+        //get height
+        vl53l1x_getDistance(&flight_current_height);
+        if (flight_status == FIX_HEIGHT)
+        {
+            //height PID
+            app_flight_height_pid(flight_current_height, flight_desired_height, flight_task_period / 1000.0);
+        }
 
         //根据PID + 摇杆数据 + flight_status 控制电机转速
         app_flight_set_motors(&remote_data);
@@ -113,7 +125,7 @@ void led_task(void *pvParameters)
     }
 }
 
-throttle_status_enum thr_status = free;
+throttle_status_enum thr_status = FREE;
 
 void comm_task(void *pvParameters)
 {

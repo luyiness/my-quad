@@ -26,4 +26,6 @@ void App_Flight_Get_EulerAngle(Gyroscope_Data* gd, EulerAngle_Struct* ea, float 
 
 void App_Flight_PID(Gyroscope_Data* gd, EulerAngle_Struct* ea, Remote_Data *rd, float dt);
 
+void app_flight_height_pid(uint16_t current_height, uint16_t desired_height, float dt);
+
 #endif //QUAD_TEST_APP_FLIGHT_H
