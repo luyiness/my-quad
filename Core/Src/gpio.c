@@ -115,6 +115,14 @@ void MX_GPIO_Init(void)
     gpio_init_struct.Speed = GPIO_SPEED_HIGH;
     HAL_GPIO_Init(SI24R1_NSS_GPIO_Port, &gpio_init_struct);
     HAL_GPIO_WritePin(SI24R1_NSS_GPIO_Port, SI24R1_NSS_Pin, GPIO_PIN_SET);  //NSS初始=1 不片选
+
+    /*VL53L1X, XSHUT_Pin */
+    gpio_init_struct.Pin = VX_XSHUT_Pin;
+    gpio_init_struct.Mode = GPIO_MODE_OUTPUT_PP;
+    gpio_init_struct.Pull = GPIO_NOPULL;
+    gpio_init_struct.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(VX_XSHUT_GPIO_Port, &gpio_init_struct);
+    HAL_GPIO_WritePin(VX_XSHUT_GPIO_Port, VX_XSHUT_Pin, GPIO_PIN_SET);
 }
 
 /* USER CODE BEGIN 2 */

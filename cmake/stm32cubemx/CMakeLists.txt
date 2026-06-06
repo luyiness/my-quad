@@ -20,6 +20,7 @@ set(MX_Include_Dirs
 	${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/Mid/portable
 	${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/SYSTEM/include
 	${CMAKE_CURRENT_SOURCE_DIR}/../../Task/include
+	${CMAKE_CURRENT_SOURCE_DIR}/../../Drivers/SYSTEM/vl53l1x/include
 )
 
 # STM32CubeMX generated application sources

@@ -93,6 +93,9 @@ HAL_GPIO_WritePin(LED1_GPIO_PORT, LED1_GPIO_PIN, GPIO_PIN_RESET); \
 #define SI24R1_CE_L (HAL_GPIO_WritePin(SI24R1_CE_GPIO_Port, SI24R1_CE_Pin, GPIO_PIN_RESET))
 #define SI24R1_CE_H (HAL_GPIO_WritePin(SI24R1_CE_GPIO_Port, SI24R1_CE_Pin, GPIO_PIN_SET))
 
+#define VX_XSHUT_Pin GPIO_PIN_12
+#define VX_XSHUT_GPIO_Port GPIOB
+
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus
