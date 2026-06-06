@@ -7,6 +7,9 @@
 #define _VL53L1_PLATFORM_H_
 
 #include "vl53l1_types.h"
+#include <i2c.h>
+
+#define DEV_ADDR 0x52		//使用I2C通信，slave地址为0x52
 
 #ifdef __cplusplus
 extern "C"
